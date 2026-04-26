@@ -14,7 +14,7 @@ services:
     networks:
       - jmeter-network
     volumes:
-      - ./test-scripts/my-api-test:/test-scripts
+      - ./test-scripts:/test-scripts   # mounts whole test-scripts/ so data/ is accessible
     expose:
       - "1099"
       - "50000"
@@ -28,7 +28,7 @@ services:
     networks:
       - jmeter-network
     volumes:
-      - ./test-scripts/my-api-test:/test-scripts
+      - ./test-scripts:/test-scripts
     expose:
       - "1099"
       - "50000"
@@ -42,7 +42,7 @@ services:
     networks:
       - jmeter-network
     volumes:
-      - ./test-scripts/my-api-test:/test-scripts
+      - ./test-scripts:/test-scripts
     expose:
       - "1099"
       - "50000"
@@ -60,7 +60,7 @@ services:
     networks:
       - jmeter-network
     volumes:
-      - ./test-scripts/my-api-test:/test-scripts
+      - ./test-scripts:/test-scripts   # JMX + data/ CSVs
       - ./results:/results
     environment:
       - THREADS=${THREADS:-10}

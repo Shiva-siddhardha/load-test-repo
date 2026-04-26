@@ -29,6 +29,11 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+        with:
+          # Checks out whatever branch triggered this workflow_dispatch.
+          # When triggered from a run_<ts> branch by the UI, this picks up
+          # the generated test-scripts/LoadTest.jmx and test-scripts/data/*.csv
+          ref: ${{ github.ref }}
 
       - name: Set run timestamp
         id: timestamp
@@ -42,6 +47,17 @@ jobs:
           sudo curl -SL https://github.com/docker/compose/releases/download/v2.24.5/docker-compose-linux-x86_64 \
             -o /usr/local/bin/docker-compose
           sudo chmod +x /usr/local/bin/docker-compose
+
+      - name: Verify test plan exists
+        run: |
+          if [ ! -f "test-scripts/LoadTest.jmx" ]; then
+            echo "❌ test-scripts/LoadTest.jmx not found on branch ${{ github.ref_name }}"
+            echo "   Make sure you triggered from a run_<ts> branch created by the UI."
+            exit 1
+          fi
+          echo "✅ Found test plan: test-scripts/LoadTest.jmx"
+          echo "   Data files present:"
+          ls test-scripts/data/ 2>/dev/null || echo "   (no data directory)"
 
       - name: Run JMeter distributed load test
         run: |
@@ -124,7 +140,7 @@ jobs:
           </head>
           <body>
             <header>
-              <h1>⚡ JMeter Load Test Dashboard</h1>
+              <h1>&#9889; JMeter Load Test Dashboard</h1>
               <span>Distributed</span>
             </header>
             <div class="container">
@@ -137,14 +153,14 @@ jobs:
                   html += f"""
                   <div class="run-card">
                     <div>
-                      <div class="ts">🕐 {ts_display}</div>
+                      <div class="ts">&#128336; {ts_display}</div>
                       <div class="meta">
                         <span>Threads: <b>{r['threads']}</b></span>
                         <span>Duration: <b>{r['duration']}</b></span>
                         <span>Workers: <b>{r['workers']}</b></span>
                       </div>
                     </div>
-                    <a class="btn" href="runs/{r['folder']}/index.html" target="_blank">View Report →</a>
+                    <a class="btn" href="runs/{r['folder']}/index.html" target="_blank">View Report &rarr;</a>
                   </div>"""
           else:
               html += '<div class="empty">No runs yet. Trigger a workflow to see results here.</div>'
@@ -162,5 +178,5 @@ jobs:
           git config user.name "github-actions"
           git config user.email "github-actions@github.com"
           git add -A
-          git commit -m "Run ${{ steps.timestamp.outputs.ts }} | threads=${{ inputs.threads }} duration=${{ inputs.duration }}s workers=${{ inputs.workers }}"
+          git commit -m "Run ${{ steps.timestamp.outputs.ts }} | threads=${{ inputs.threads }} duration=${{ inputs.duration }}s workers=${{ inputs.workers }} branch=${{ github.ref_name }}"
           git push origin gh-pages
