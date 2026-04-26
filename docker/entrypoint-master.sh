@@ -55,10 +55,9 @@ jmeter -n \
   -R $WORKER_LIST \
   -l /results/results.jtl \
   -e -o /results/html-report \
-  -Jthreads=$THREADS \
-  -Jduration=$DURATION \
-  -Jrampup=$RAMPUP \
-  -Jtarget_url=$TARGET_URL \
+  -Gthreads=$THREADS \
+  -Gduration=$DURATION \
+  -Grampup=$RAMPUP \
   -Dsummariser.interval=30 \
   -Dserver.rmi.ssl.disable=true
 
