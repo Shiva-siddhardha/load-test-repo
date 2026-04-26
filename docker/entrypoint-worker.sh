@@ -16,4 +16,5 @@ export JVM_ARGS
 exec jmeter-server \
   -Dserver.rmi.localport=50000 \
   -Dserver_port=1099 \
-  -Djava.rmi.server.hostname=$WORKER_IP
+  -Djava.rmi.server.hostname=$WORKER_IP \
+  -Dserver.rmi.ssl.disable=true
