@@ -26,18 +26,20 @@ on:
 
 jobs:
   load-test:
-    runs-on: ubuntu-latest        # FREE GitHub-hosted runner, 2CPU 7GB RAM
+    runs-on: ubuntu-latest
     permissions:
-      contents: write             # needed for GitHub Pages publish
+      contents: write
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Install Docker Compose plugin
+      - name: Install Docker Compose
         run: |
-          sudo apt-get update -qq
-          sudo apt-get install -y docker-compose-plugin
+          sudo curl -SL https://github.com/docker/compose/releases/download/v2.24.5/docker-compose-linux-x86_64 \
+            -o /usr/local/bin/docker-compose
+          sudo chmod +x /usr/local/bin/docker-compose
+          docker-compose version
 
       - name: Create results directory
         run: mkdir -p results
@@ -49,11 +51,11 @@ jobs:
           RAMPUP=${{ inputs.rampup }} \
           WORKERS=${{ inputs.workers }} \
           TARGET_URL="${{ inputs.target_url }}" \
-          docker compose up --build --abort-on-container-exit --exit-code-from jmeter-master
+          docker-compose up --build --abort-on-container-exit --exit-code-from jmeter-master
 
       - name: Tear down containers
         if: always()
-        run: docker compose down --remove-orphans
+        run: docker-compose down --remove-orphans
 
       - name: Upload raw results as artifact
         uses: actions/upload-artifact@v4
