@@ -1,0 +1,34 @@
+{
+  "HTTP GET - jsonplaceholder.typicode.com/posts" : {
+    "transaction" : "HTTP GET - jsonplaceholder.typicode.com/posts",
+    "sampleCount" : 1360,
+    "errorCount" : 0,
+    "errorPct" : 0.0,
+    "meanResTime" : 43.388235294117585,
+    "medianResTime" : 26.0,
+    "minResTime" : 23.0,
+    "maxResTime" : 440.0,
+    "pct1ResTime" : 137.0,
+    "pct2ResTime" : 154.0,
+    "pct3ResTime" : 161.0,
+    "throughput" : 45.51539491298527,
+    "receivedKBytesPerSec" : 1277.4558520540495,
+    "sentKBytesPerSec" : 6.352885500334672
+  },
+  "Total" : {
+    "transaction" : "Total",
+    "sampleCount" : 1360,
+    "errorCount" : 0,
+    "errorPct" : 0.0,
+    "meanResTime" : 43.388235294117585,
+    "medianResTime" : 26.0,
+    "minResTime" : 23.0,
+    "maxResTime" : 440.0,
+    "pct1ResTime" : 137.0,
+    "pct2ResTime" : 154.0,
+    "pct3ResTime" : 161.0,
+    "throughput" : 45.51539491298527,
+    "receivedKBytesPerSec" : 1277.4558520540495,
+    "sentKBytesPerSec" : 6.352885500334672
+  }
+}
