@@ -1,203 +1,44 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="description" content="">
-    <meta name="author" content="">
-
-    <title>Apache JMeter Dashboard</title>
-
-     <!-- Bootstrap Core CSS -->
-    <link href="sbadmin2-1.0.7/bower_components/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
-
-    <!-- MetisMenu CSS -->
-    <link href="sbadmin2-1.0.7/bower_components/metisMenu/dist/metisMenu.min.css" rel="stylesheet">
-
-    <!-- Custom CSS -->
-    <link href="sbadmin2-1.0.7/dist/css/sb-admin-2.css" rel="stylesheet">
-
-    <!-- Dashboard css -->
-    <link href="content/css/dashboard.css" rel="stylesheet">
-
-    <!-- Table sorter -->
-    <link href="content/css/theme.blue.css" rel="stylesheet">
-
-    <!-- icon -->
-    <link rel="icon" type="image/png" href="content/pages/icon-apache.png" />
-
-    <!-- Custom Fonts -->
-    <link href="sbadmin2-1.0.7/bower_components/font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>JMeter Load Test Results</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #0f1117; color: #e2e8f0; min-height: 100vh; }
+    header { background: #1a1d27; border-bottom: 1px solid #2d3148; padding: 24px 40px; display: flex; align-items: center; gap: 16px; }
+    header h1 { font-size: 22px; font-weight: 700; color: #fff; }
+    header span { background: #3b82f6; color: #fff; font-size: 11px; font-weight: 600; padding: 3px 10px; border-radius: 20px; }
+    .container { max-width: 960px; margin: 40px auto; padding: 0 24px; }
+    h2 { font-size: 14px; font-weight: 600; color: #94a3b8; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 16px; }
+    .run-card { background: #1a1d27; border: 1px solid #2d3148; border-radius: 10px; padding: 20px 24px; margin-bottom: 12px; display: flex; align-items: center; justify-content: space-between; transition: border-color 0.2s; }
+    .run-card:hover { border-color: #3b82f6; }
+    .run-card .ts { font-size: 15px; font-weight: 600; color: #fff; }
+    .run-card .meta { display: flex; gap: 20px; margin-top: 6px; }
+    .run-card .meta span { font-size: 12px; color: #64748b; }
+    .run-card .meta span b { color: #94a3b8; }
+    .btn { background: #3b82f6; color: #fff; border: none; padding: 8px 20px; border-radius: 6px; font-size: 13px; font-weight: 600; cursor: pointer; text-decoration: none; white-space: nowrap; }
+    .btn:hover { background: #2563eb; }
+    .empty { text-align: center; color: #475569; padding: 80px 0; font-size: 15px; }
+  </style>
 </head>
-
 <body>
-    <div id="wrapper">
-        <nav class="navbar navbar-default navbar-static-top" role="navigation" style="margin-bottom: 0">
-            <div class="navbar-header">
-                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
-                    <span class="sr-only">Toggle navigation</span>
-                    <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
-                </button>
-                <a class="navbar-brand" href="index.html">Apache JMeter Dashboard</a>
-            </div>
-            <div class="navbar-default sidebar" role="navigation">
-                <div class="sidebar-nav navbar-collapse">
-                    <ul class="nav" id="side-menu">
-                        <li>
-                            <a href="index.html"><i class="fa fa-dashboard fa-fw"></i> Dashboard</a>
-                        </li>
-                        <li>
-                            <a href="#"><i class="fa fa-bar-chart-o fa-fw"></i> Charts<span class="fa arrow"></span></a>
-                            <ul class="nav nav-second-level">
-                                <li>
-                                    <a href="content/pages/OverTime.html">Over Time</a>
-                                </li>
-                                <li>
-                                    <a href="content/pages/Throughput.html">Throughput</a>
-                                </li>
-                                <li>
-                                    <a href="content/pages/ResponseTimes.html">Response Times</a>
-                                </li>
-                            </ul>
-                            <!-- /.nav-second-level -->
-                        </li>
-                        
-                        <li>
-                            <a href="#"><i class="fa fa-bar-chart-o fa-fw"></i> Customs Graphs<span class="fa arrow"></span></a>
-                            <ul class="nav nav-second-level">
-                                <li>
-                                    <a href="content/pages/CustomsGraphs.html">Over Time</a>
-                                </li>
-                            </ul>
-                        </li>
-                    </ul>
-                </div>
-            </div>
-        </nav>
-        <div id="page-wrapper">
-            <div class="row">
-                <div class="col-lg-12">
-                     <div class="panel panel-default" >
-                        <div class="panel-heading" style="text-align:center;">
-                           <p class="dashboard-title">Test and Report information</p>
-                        </div>
-                        <div class="panel-body">
-                        <table id="generalInfos" class="table table-bordered table-condensed " >
-                            <tr>
-                                <td>Source file</td>
-                                <td>"results.jtl"</td>
-                            </tr>
-                            <tr>
-                                <td>Start Time</td>
-                                <td>"4/26/26, 12:56 PM"</td>
-                            </tr>
-                            <tr>
-                                <td>End Time</td>
-                                <td>"4/26/26, 12:57 PM"</td>
-                            </tr>
-                                <tr>
-                                    <td>Filter for display</td>
-                                    <td>""</td>
-                                </tr>
-                        </table>
-                     </div>
-                </div>
-            </div>
-            <div class="row">
-                <div class="col-lg-6">
-                    <div class="panel panel-default" style="text-align:center;">
-                        <div class="panel-heading">
-                           <p class="dashboard-title"><a href="https://en.wikipedia.org/wiki/Apdex" target="_blank">APDEX (Application Performance Index)</a></p>
-                        </div>
-                        <div class="panel-body">
-                            <section id="apdex" class="col-md-12 table-responsive">
-                                <table id="apdexTable" class="table table-bordered table-condensed tablesorter ">
-                                </table>
-                            </section>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-lg-6" >
-                    <div class="panel panel-default" style="text-align:center;">
-                        <div class="panel-heading">
-                           <p class="dashboard-title">Requests Summary</p>
-                        </div>
-                           <div class="panel-body">
-                            <div class="flot-chart" style="height:200px;">
-                                <div class="flot-chart-content" id="flot-requests-summary" style="height:200px;"/>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="col-lg-12">
-                <div class="panel panel-default" style="text-align:center;">
-                       <div class="panel-heading" >
-                           <p class="dashboard-title">Statistics</p>
-                       </div>
-                <div class="panel-body ">
-                    <section class="col-md-12 table-responsive">
-                        <table id="statisticsTable" class="table table-bordered table-condensed tablesorter " >
-                        </table>
-                    </section>
-                </div>
-            </div>
-            <div class="col-lg-12">
-                <div class="panel panel-default" style="text-align:center;">
-                    <div class="panel-heading">
-                        <p class="dashboard-title">Errors</p>
-                    </div>
-                    <div class="panel-body">
-                        <section class="col-md-12 table-responsive">
-                            <table id="errorsTable" class="table table-bordered table-condensed tablesorter ">
-                            </table>
-                        </section>
-                    </div>
-                </div>
-            </div>
-            <div class="col-lg-12">
-                <div class="panel panel-default" style="text-align:center;">
-                    <div class="panel-heading">
-                        <p class="dashboard-title">Top 5 Errors by sampler</p>
-                    </div>
-                    <div class="panel-body">
-                        <section class="col-md-12 table-responsive">
-                            <table id="top5ErrorsBySamplerTable" class="table table-bordered table-condensed tablesorter ">
-                            </table>
-                        </section>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
+  <header>
+    <h1>⚡ JMeter Load Test Dashboard</h1>
+    <span>Distributed</span>
+  </header>
+  <div class="container">
+    <h2>All Runs</h2>
 
-    <!-- jQuery -->
-    <script src="sbadmin2-1.0.7/bower_components/jquery/dist/jquery.min.js"></script>
-
-    <!-- Bootstrap Core JavaScript -->
-    <script src="sbadmin2-1.0.7/bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
-    <script src="sbadmin2-1.0.7/bower_components/flot/excanvas.min.js"></script>
-    <script src="sbadmin2-1.0.7/bower_components/flot/jquery.flot.js"></script>
-    <script src="sbadmin2-1.0.7/bower_components/flot/jquery.flot.pie.js"></script>
-    <script src="sbadmin2-1.0.7/bower_components/flot/jquery.flot.resize.js"></script>
-    <script src="sbadmin2-1.0.7/bower_components/flot/jquery.flot.time.js"></script>
-    <script src="sbadmin2-1.0.7/bower_components/flot.tooltip/js/jquery.flot.tooltip.min.js"></script>
-    <script src="sbadmin2-1.0.7/bower_components/flot-axislabels/jquery.flot.axislabels.js"></script>
-    <!-- Metis Menu Plugin JavaScript -->
-    <script src="sbadmin2-1.0.7/bower_components/metisMenu/dist/metisMenu.min.js"></script>
-
-    <script src="content/js/dashboard-commons.js"></script>
-    <script src="content/js/dashboard.js"></script>
-
-    <!-- Custom Theme JavaScript -->
-    <script src="sbadmin2-1.0.7/dist/js/sb-admin-2.js"></script>
-    <script type="text/javascript" src="content/js/jquery.tablesorter.min.js"></script>
-
-</body>
-
-</html>
+        <div class="run-card">
+          <div>
+            <div class="ts">🕐 2026/04/26 13:08:35</div>
+            <div class="meta">
+              <span>Threads: <b>1</b></span>
+              <span>Duration: <b>30s</b></span>
+              <span>Workers: <b>2</b></span>
+            </div>
+          </div>
+          <a class="btn" href="runs/2026-04-26_13-08-35__threads-1__duration-30s__workers-2/index.html" target="_blank">View Report →</a>
+        </div></div></body></html>
