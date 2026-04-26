@@ -1,0 +1,32 @@
+FROM eclipse-temurin:11-jdk-jammy
+
+ARG JMETER_VERSION=5.6.3
+
+RUN apt-get update && apt-get install -y \
+    wget \
+    unzip \
+    curl \
+    netcat-openbsd \
+    && rm -rf /var/lib/apt/lists/*
+
+# Download and install JMeter
+RUN wget -q https://archive.apache.org/dist/jmeter/binaries/apache-jmeter-${JMETER_VERSION}.tgz \
+    && tar -xzf apache-jmeter-${JMETER_VERSION}.tgz -C /opt \
+    && rm apache-jmeter-${JMETER_VERSION}.tgz \
+    && ln -s /opt/apache-jmeter-${JMETER_VERSION} /opt/jmeter
+
+ENV PATH="/opt/jmeter/bin:$PATH"
+ENV JMETER_HOME="/opt/jmeter"
+
+# Enable summariser output in console
+RUN echo "summariser.name=summary" >> /opt/jmeter/bin/jmeter.properties && \
+    echo "summariser.interval=30" >> /opt/jmeter/bin/jmeter.properties && \
+    echo "summariser.log=true" >> /opt/jmeter/bin/jmeter.properties && \
+    echo "summariser.out=true" >> /opt/jmeter/bin/jmeter.properties
+
+COPY entrypoint-master.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
+
+VOLUME ["/test-scripts", "/results"]
+
+ENTRYPOINT ["/entrypoint.sh"]

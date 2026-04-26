@@ -1,0 +1,4 @@
+# Results directory
+# This folder is created at runtime — do not commit test results to git
+*.jtl
+html-report/

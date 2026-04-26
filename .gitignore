@@ -1,0 +1,4 @@
+results/results.jtl
+results/html-report/
+*.pem
+*.key

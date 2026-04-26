@@ -1,0 +1,65 @@
+version: "3.8"
+
+networks:
+  jmeter-network:
+    driver: bridge
+
+services:
+
+  jmeter-worker-1:
+    build:
+      context: ./docker
+      dockerfile: Dockerfile.worker
+    container_name: jmeter-worker-1
+    networks:
+      - jmeter-network
+    expose:
+      - "1099"
+      - "50000"
+    restart: "no"
+
+  jmeter-worker-2:
+    build:
+      context: ./docker
+      dockerfile: Dockerfile.worker
+    container_name: jmeter-worker-2
+    networks:
+      - jmeter-network
+    expose:
+      - "1099"
+      - "50000"
+    restart: "no"
+
+  jmeter-worker-3:
+    build:
+      context: ./docker
+      dockerfile: Dockerfile.worker
+    container_name: jmeter-worker-3
+    networks:
+      - jmeter-network
+    expose:
+      - "1099"
+      - "50000"
+    restart: "no"
+
+  jmeter-master:
+    build:
+      context: ./docker
+      dockerfile: Dockerfile.master
+    container_name: jmeter-master
+    depends_on:
+      - jmeter-worker-1
+      - jmeter-worker-2
+      - jmeter-worker-3
+    networks:
+      - jmeter-network
+    volumes:
+      - ./test-scripts/my-api-test:/test-scripts
+      - ./results:/results
+    environment:
+      - THREADS=${THREADS:-10}
+      - DURATION=${DURATION:-60}
+      - RAMPUP=${RAMPUP:-10}
+      - TARGET_URL=${TARGET_URL:-https://jsonplaceholder.typicode.com/posts}
+      - WORKERS=${WORKERS:-3}
+    restart: "no"

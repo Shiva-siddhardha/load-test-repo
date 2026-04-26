@@ -1,0 +1,26 @@
+FROM eclipse-temurin:11-jdk-jammy
+
+ARG JMETER_VERSION=5.6.3
+
+RUN apt-get update && apt-get install -y \
+    wget \
+    unzip \
+    curl \
+    netcat-openbsd \
+    && rm -rf /var/lib/apt/lists/*
+
+# Download and install JMeter
+RUN wget -q https://archive.apache.org/dist/jmeter/binaries/apache-jmeter-${JMETER_VERSION}.tgz \
+    && tar -xzf apache-jmeter-${JMETER_VERSION}.tgz -C /opt \
+    && rm apache-jmeter-${JMETER_VERSION}.tgz \
+    && ln -s /opt/apache-jmeter-${JMETER_VERSION} /opt/jmeter
+
+ENV PATH="/opt/jmeter/bin:$PATH"
+ENV JMETER_HOME="/opt/jmeter"
+
+COPY entrypoint-worker.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
+
+EXPOSE 1099 50000
+
+ENTRYPOINT ["/entrypoint.sh"]
