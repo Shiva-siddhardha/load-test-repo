@@ -51,7 +51,7 @@ jobs:
           RAMPUP=${{ inputs.rampup }} \
           WORKERS=${{ inputs.workers }} \
           TARGET_URL="${{ inputs.target_url }}" \
-          docker-compose up --build --abort-on-container-exit --exit-code-from jmeter-master
+          docker-compose up --build --force-recreate --abort-on-container-exit --exit-code-from jmeter-master
 
       - name: Tear down containers
         if: always()
