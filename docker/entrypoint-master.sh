@@ -4,7 +4,6 @@ set -e
 THREADS=${THREADS:-10}
 DURATION=${DURATION:-60}
 RAMPUP=${RAMPUP:-10}
-TARGET_URL=${TARGET_URL:-https://jsonplaceholder.typicode.com/posts}
 WORKERS=${WORKERS:-3}
 
 WORKER_LIST=""
@@ -18,7 +17,6 @@ done
 
 echo "================================================"
 echo "  JMeter Distributed Load Test"
-echo "  Target:   $TARGET_URL"
 echo "  Threads:  $THREADS"
 echo "  Duration: $DURATION seconds"
 echo "  Ramp-up:  $RAMPUP seconds"
@@ -34,7 +32,7 @@ for worker in $(echo $WORKER_LIST | tr ',' ' '); do
       break
     fi
     if [ $i -eq 30 ]; then
-      echo "  ❌ $worker not ready after 30 attempts — aborting"
+      echo "  ❌ $worker not ready"
       exit 1
     fi
     sleep 2

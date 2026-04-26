@@ -16,13 +16,9 @@ on:
         required: true
         default: "15"
       workers:
-        description: "Number of JMeter workers (1-3, keep <=3 on free runner)"
+        description: "Number of JMeter workers (1-3)"
         required: true
         default: "2"
-      target_url:
-        description: "Target base URL"
-        required: true
-        default: "https://jsonplaceholder.typicode.com/posts"
 
 jobs:
   load-test:
@@ -33,7 +29,11 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-      
+
+      - name: Set run timestamp
+        id: timestamp
+        run: echo "ts=$(date +'%Y-%m-%d_%H-%M-%S')" >> $GITHUB_OUTPUT
+
       - name: Clean previous results
         run: rm -rf results && mkdir -p results
 
@@ -42,10 +42,6 @@ jobs:
           sudo curl -SL https://github.com/docker/compose/releases/download/v2.24.5/docker-compose-linux-x86_64 \
             -o /usr/local/bin/docker-compose
           sudo chmod +x /usr/local/bin/docker-compose
-          docker-compose version
-
-      - name: Create results directory
-        run: mkdir -p results
 
       - name: Run JMeter distributed load test
         run: |
@@ -53,7 +49,6 @@ jobs:
           DURATION=${{ inputs.duration }} \
           RAMPUP=${{ inputs.rampup }} \
           WORKERS=${{ inputs.workers }} \
-          TARGET_URL="${{ inputs.target_url }}" \
           docker-compose up --build --force-recreate --abort-on-container-exit --exit-code-from jmeter-master
 
       - name: Tear down containers
@@ -63,13 +58,109 @@ jobs:
       - name: Upload raw results as artifact
         uses: actions/upload-artifact@v4
         with:
-          name: jmeter-results-run-${{ github.run_number }}
+          name: jmeter-results-${{ steps.timestamp.outputs.ts }}
           path: results/results.jtl
           retention-days: 90
 
-      - name: Deploy HTML report to GitHub Pages
-        uses: peaceiris/actions-gh-pages@v3
+      - name: Checkout gh-pages branch
+        uses: actions/checkout@v4
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./results/html-report
-          destination_dir: .
+          ref: gh-pages
+          path: gh-pages-dir
+
+      - name: Copy report into timestamped folder
+        run: |
+          FOLDER="runs/${{ steps.timestamp.outputs.ts }}__threads-${{ inputs.threads }}__duration-${{ inputs.duration }}s__workers-${{ inputs.workers }}"
+          mkdir -p gh-pages-dir/$FOLDER
+          cp -r results/html-report/. gh-pages-dir/$FOLDER/
+          echo $FOLDER > gh-pages-dir/.latest
+
+      - name: Rebuild index page
+        run: |
+          cd gh-pages-dir
+          python3 - <<'EOF'
+          import os, json
+
+          runs_dir = "runs"
+          runs = []
+          if os.path.exists(runs_dir):
+              for folder in sorted(os.listdir(runs_dir), reverse=True):
+                  if os.path.isdir(os.path.join(runs_dir, folder)):
+                      parts = folder.split("__")
+                      ts = parts[0]
+                      meta = {p.split("-")[0]: "-".join(p.split("-")[1:]) for p in parts[1:]}
+                      runs.append({
+                          "folder": folder,
+                          "ts": ts,
+                          "threads": meta.get("threads", "?"),
+                          "duration": meta.get("duration", "?"),
+                          "workers": meta.get("workers", "?"),
+                      })
+
+          html = """<!DOCTYPE html>
+          <html lang="en">
+          <head>
+            <meta charset="UTF-8"/>
+            <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+            <title>JMeter Load Test Results</title>
+            <style>
+              * { box-sizing: border-box; margin: 0; padding: 0; }
+              body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #0f1117; color: #e2e8f0; min-height: 100vh; }
+              header { background: #1a1d27; border-bottom: 1px solid #2d3148; padding: 24px 40px; display: flex; align-items: center; gap: 16px; }
+              header h1 { font-size: 22px; font-weight: 700; color: #fff; }
+              header span { background: #3b82f6; color: #fff; font-size: 11px; font-weight: 600; padding: 3px 10px; border-radius: 20px; }
+              .container { max-width: 960px; margin: 40px auto; padding: 0 24px; }
+              h2 { font-size: 14px; font-weight: 600; color: #94a3b8; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 16px; }
+              .run-card { background: #1a1d27; border: 1px solid #2d3148; border-radius: 10px; padding: 20px 24px; margin-bottom: 12px; display: flex; align-items: center; justify-content: space-between; transition: border-color 0.2s; }
+              .run-card:hover { border-color: #3b82f6; }
+              .run-card .ts { font-size: 15px; font-weight: 600; color: #fff; }
+              .run-card .meta { display: flex; gap: 20px; margin-top: 6px; }
+              .run-card .meta span { font-size: 12px; color: #64748b; }
+              .run-card .meta span b { color: #94a3b8; }
+              .btn { background: #3b82f6; color: #fff; border: none; padding: 8px 20px; border-radius: 6px; font-size: 13px; font-weight: 600; cursor: pointer; text-decoration: none; white-space: nowrap; }
+              .btn:hover { background: #2563eb; }
+              .empty { text-align: center; color: #475569; padding: 80px 0; font-size: 15px; }
+            </style>
+          </head>
+          <body>
+            <header>
+              <h1>⚡ JMeter Load Test Dashboard</h1>
+              <span>Distributed</span>
+            </header>
+            <div class="container">
+              <h2>All Runs</h2>
+          """
+
+          if runs:
+              for r in runs:
+                  ts_display = r['ts'].replace("_", " ").replace("-", "/", 2).replace("-", ":")
+                  html += f"""
+                  <div class="run-card">
+                    <div>
+                      <div class="ts">🕐 {ts_display}</div>
+                      <div class="meta">
+                        <span>Threads: <b>{r['threads']}</b></span>
+                        <span>Duration: <b>{r['duration']}</b></span>
+                        <span>Workers: <b>{r['workers']}</b></span>
+                      </div>
+                    </div>
+                    <a class="btn" href="runs/{r['folder']}/index.html" target="_blank">View Report →</a>
+                  </div>"""
+          else:
+              html += '<div class="empty">No runs yet. Trigger a workflow to see results here.</div>'
+
+          html += "</div></body></html>"
+
+          with open("index.html", "w") as f:
+              f.write(html)
+          print(f"Built index with {len(runs)} runs")
+          EOF
+
+      - name: Push to gh-pages
+        run: |
+          cd gh-pages-dir
+          git config user.name "github-actions"
+          git config user.email "github-actions@github.com"
+          git add -A
+          git commit -m "Run ${{ steps.timestamp.outputs.ts }} | threads=${{ inputs.threads }} duration=${{ inputs.duration }}s workers=${{ inputs.workers }}"
+          git push origin gh-pages

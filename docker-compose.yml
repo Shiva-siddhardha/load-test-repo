@@ -66,6 +66,5 @@ services:
       - THREADS=${THREADS:-10}
       - DURATION=${DURATION:-60}
       - RAMPUP=${RAMPUP:-10}
-      - TARGET_URL=${TARGET_URL:-https://jsonplaceholder.typicode.com/posts}
       - WORKERS=${WORKERS:-3}
     restart: "no"
