@@ -59,7 +59,7 @@ jmeter -n \
   -Jduration=$DURATION \
   -Jrampup=$RAMPUP \
   -Jtarget_url=$TARGET_URL \
-  -Jsummariser.interval=30 \
+  -Dsummariser.interval=30 \
   -Dserver.rmi.ssl.disable=true
 
 echo ""
