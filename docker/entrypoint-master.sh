@@ -7,7 +7,6 @@ RAMPUP=${RAMPUP:-10}
 TARGET_URL=${TARGET_URL:-https://jsonplaceholder.typicode.com/posts}
 WORKERS=${WORKERS:-3}
 
-# Build worker hostnames list: jmeter-worker-1,jmeter-worker-2,...
 WORKER_LIST=""
 for i in $(seq 1 $WORKERS); do
   if [ -z "$WORKER_LIST" ]; then
@@ -26,7 +25,6 @@ echo "  Ramp-up:  $RAMPUP seconds"
 echo "  Workers:  $WORKER_LIST"
 echo "================================================"
 
-# Wait for workers to be ready
 echo "Waiting for workers to come online..."
 for worker in $(echo $WORKER_LIST | tr ',' ' '); do
   echo "  Checking $worker:1099..."
@@ -47,7 +45,6 @@ echo ""
 echo "All workers ready. Starting test..."
 echo ""
 
-# Clean up old results
 rm -rf /results/results.jtl /results/html-report
 
 JVM_ARGS="-Xms1g -Xmx1g"
@@ -62,7 +59,8 @@ jmeter -n \
   -Jduration=$DURATION \
   -Jrampup=$RAMPUP \
   -Jtarget_url=$TARGET_URL \
-  -Jsummariser.interval=30
+  -Jsummariser.interval=30 \
+  -Dserver.rmi.ssl.disable=true
 
 echo ""
 echo "================================================"
